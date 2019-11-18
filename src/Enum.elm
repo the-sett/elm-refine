@@ -71,9 +71,15 @@ encoder enum val =
 
 {-| Dicts
 -}
-emptyDict : Enum a -> Dict a v
+emptyDict : Enum k -> Dict String k v
+
+
+singletonDict : Enum k -> k -> v -> Dict String k v
 
 
 {-| Sets
 -}
-emptySet : Enum a -> Set a
+emptySet : Enum k -> Set k
+
+
+singletonSet : Enum k -> k -> Set k

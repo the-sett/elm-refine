@@ -42,12 +42,18 @@ encoder (Refined _ _ encoderI _ unboxFn) val =
 
 {-| Dicts
 -}
-emptyDict : Refined i a e -> Dict a v
+emptyDict : Refined comparable k e -> Dict comparable k v
+
+
+singletonDict : Refined comparable k e -> k -> v -> Dict comparable k v
 
 
 {-| Sets
 -}
-emptySet : Refined i a e -> Set a
+emptySet : Refined comparable k e -> Set comparable k
+
+
+singletonSet : Refined comparable k e -> k -> Set comparable k
 
 
 

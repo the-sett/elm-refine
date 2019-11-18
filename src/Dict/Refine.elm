@@ -1,5 +1,5 @@
-module Dict exposing
-    ( empty, singleton, insert, update, remove
+module Dict.Refine exposing
+    ( insert, update, remove
     , isEmpty, member, get, size
     , keys, values, toList, fromList
     , map, foldl, foldr, filter, partition
@@ -16,7 +16,7 @@ module Dict exposing
 
 # Build
 
-@docs empty, singleton, insert, update, remove
+@docs insert, update, remove
 
 
 # Query
@@ -40,18 +40,14 @@ module Dict exposing
 
 -}
 
-import Dict exposing (Dict)
+import Dict
 
 
-type alias Dict k v =
-    Dict.Dict k v
-
-
-{-| Create a trie with one key-value pair.
--}
-singleton : String -> a -> Dict a
-singleton key val =
-    Dict.singleton (String.toList key) val
+type Dict comparable k v
+    = Dict
+        { dict : Dict comparable ( k, v )
+        , toKey : k -> comparable
+        }
 
 
 {-| Insert a key-value pair into a trie. Replaces value when there is
