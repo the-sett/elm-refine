@@ -12,13 +12,24 @@ ensures that it can only take on certain values. The basic type is wrapped in a
 custom type which is made opaque - so that only instances of it with the allowable
 values can ever be created.
 
-@docs Refined
 
+# Definition of Refined types and functions to create them.
+
+@docs Refined
 @docs make, build
+
+
+# Helper functions for working with refined types.
 
 @docs decoder, encoder, emptyDict, singletonDict
 
+
+# Functions for building refined integers.
+
 @docs IntError, intErrorToString, gt, lt
+
+
+# Functions for building refined strings.
 
 @docs StringError, stringErrorToString, minLength, maxLength, regexMatch
 

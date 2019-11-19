@@ -44,6 +44,8 @@ module Dict.Refined exposing
 import Dict
 
 
+{-| Dictionary over any keys with a function to map keys to comparable.
+-}
 type Dict comparable k v
     = Dict
         { dict : Dict.Dict comparable ( k, v )

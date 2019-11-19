@@ -6,8 +6,15 @@ module Enum exposing
 
 {-| Enum provides support for various different ways of defining an enum in Elm.
 
+
+# Definition of Enums and functions to create them.
+
 @docs Enum
 @docs find, make
+
+
+# Helper functions for working with Enums.
+
 @docs decoder, encoder, toString
 
 -}

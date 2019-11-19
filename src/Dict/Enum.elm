@@ -44,6 +44,8 @@ module Dict.Enum exposing
 import Dict.Refined
 
 
+{-| Dictionary over any keys with a function to map those keys to strings.
+-}
 type alias Dict k v =
     Dict.Refined.Dict String k v
 
