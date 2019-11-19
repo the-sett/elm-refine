@@ -10,6 +10,7 @@ module Enum exposing
 
 -}
 
+import Dict.Impl
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 
@@ -69,17 +70,14 @@ encoder enum val =
         |> Encode.string
 
 
-{-| Dicts
--}
-emptyDict : Enum k -> Dict String k v
 
-
-singletonDict : Enum k -> k -> v -> Dict String k v
-
-
-{-| Sets
--}
-emptySet : Enum k -> Set k
-
-
-singletonSet : Enum k -> k -> Set k
+{- Dicts -}
+-- emptyDict : Enum k -> Dict String k v
+--
+--
+-- singletonDict : Enum k -> k -> v -> Dict String k v
+{- Sets -}
+-- emptySet : Enum k -> Set k
+--
+--
+-- singletonSet : Enum k -> k -> Set k

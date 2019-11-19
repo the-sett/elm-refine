@@ -40,23 +40,17 @@ encoder (Refined _ _ encoderI _ unboxFn) val =
         |> encoderI
 
 
-{-| Dicts
--}
-emptyDict : Refined comparable k e -> Dict comparable k v
 
-
-singletonDict : Refined comparable k e -> k -> v -> Dict comparable k v
-
-
-{-| Sets
--}
-emptySet : Refined comparable k e -> Set comparable k
-
-
-singletonSet : Refined comparable k e -> k -> Set comparable k
-
-
-
+{- Dicts -}
+-- emptyDict : Refined comparable k e -> Dict comparable k v
+--
+--
+-- singletonDict : Refined comparable k e -> k -> v -> Dict comparable k v
+{- Sets -}
+-- emptySet : Refined comparable k e -> Set comparable k
+--
+--
+-- singletonSet : Refined comparable k e -> k -> Set comparable k
 -- Helper guard functions for numbers.
 
 
