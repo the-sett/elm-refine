@@ -1,4 +1,28 @@
-module Refined exposing (..)
+module Refined exposing
+    ( Refined
+    , make, build
+    , decoder, encoder, emptyDict, singletonDict
+    , IntError, intErrorToString, gt, lt
+    , StringError, stringErrorToString, minLength, maxLength, regexMatch
+    )
+
+{-| Refined provides support for common ways of creating refined types in Elm.
+A refined type is a basic type like Int or String, that has a constructor which
+ensures that it can only take on certain values. The basic type is wrapped in a
+custom type which is made opaque - so that only instances of it with the allowable
+values can ever be created.
+
+@docs Refined
+
+@docs make, build
+
+@docs decoder, encoder, emptyDict, singletonDict
+
+@docs IntError, intErrorToString, gt, lt
+
+@docs StringError, stringErrorToString, minLength, maxLength, regexMatch
+
+-}
 
 import Dict.Refined
 import Json.Decode as Decode exposing (Decoder)
@@ -6,20 +30,37 @@ import Json.Encode as Encode exposing (Value)
 import Regex
 
 
+{-| Refined types.
+
+`i` is the underlying basic type.
+`a` is the refined custom type that will be created
+from it.
+`e` is the type or errors that the constructor can return when invalid inputs
+are given.
+
+-}
 type Refined i a e
     = Refined (i -> Result e a) (Decoder i) (i -> Value) (e -> String) (a -> i)
 
 
+{-| Creates a refined type from the input guard function, decoder on the underlying basic type,
+encoder on the underlying basic type, the error to string function, and the unboxing function
+that extracts the underlying basic type.
+-}
 make : (i -> Result e a) -> Decoder i -> (i -> Value) -> (e -> String) -> (a -> i) -> Refined i a e
 make guardFn dec enc errorToStringFn unboxFn =
     Refined guardFn dec enc errorToStringFn unboxFn
 
 
+{-| Builds an instance of a refined type from its input type.
+-}
 build : Refined i a e -> i -> Result e a
 build (Refined buildFn _ _ _ _) val =
     buildFn val
 
 
+{-| JSON decoder for a refined type.
+-}
 decoder : Refined i a e -> Decoder a
 decoder (Refined buildFn decoderI _ errorToStringFn _) =
     decoderI
@@ -35,6 +76,8 @@ decoder (Refined buildFn decoderI _ errorToStringFn _) =
             )
 
 
+{-| JSON encoder for a refined type.
+-}
 encoder : Refined i a e -> a -> Value
 encoder (Refined _ _ encoderI _ unboxFn) val =
     unboxFn val
@@ -64,11 +107,15 @@ singletonDict (Refined _ _ _ _ unboxFn) =
 -- Helper guard functions for numbers.
 
 
+{-| Describes the possible errors that can occur when creating a refined integer.
+-}
 type IntError
     = BelowRange
     | AboveRange
 
 
+{-| Translates integer errors to descriptive strings.
+-}
 intErrorToString : IntError -> String
 intErrorToString err =
     case err of
@@ -79,6 +126,8 @@ intErrorToString err =
             "Too high."
 
 
+{-| Guard function for creating an integer that must be greater than a given value.
+-}
 gt : Int -> Int -> Result IntError Int
 gt bound val =
     if bound <= val then
@@ -88,6 +137,8 @@ gt bound val =
         Ok val
 
 
+{-| Guard function for creating an integer that must be less than a given value.
+-}
 lt : Int -> Int -> Result IntError Int
 lt bound val =
     if bound >= val then
@@ -101,12 +152,16 @@ lt bound val =
 -- Helper guard functions for strings.
 
 
+{-| Describes the possible errors that can occur when creating a refined string.
+-}
 type StringError
     = TooShort
     | TooLong
     | NotMatchingRegex
 
 
+{-| Translates string errors to descriptive strings.
+-}
 stringErrorToString : StringError -> String
 stringErrorToString err =
     case err of
@@ -120,6 +175,8 @@ stringErrorToString err =
             "Not matching regex."
 
 
+{-| Guard function for creating a string that must have a given minimum length.
+-}
 minLength : Int -> String -> Result StringError String
 minLength bound val =
     if String.length val < bound then
@@ -129,6 +186,8 @@ minLength bound val =
         Ok val
 
 
+{-| Guard function for creating a string that must have a given maximum length.
+-}
 maxLength : Int -> String -> Result StringError String
 maxLength bound val =
     if String.length val > bound then
@@ -138,6 +197,8 @@ maxLength bound val =
         Ok val
 
 
+{-| Guard function for creating a string that must match a given regular expression.
+-}
 regexMatch : String -> String -> Result StringError String
 regexMatch pattern val =
     let

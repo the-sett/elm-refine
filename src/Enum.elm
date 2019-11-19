@@ -1,12 +1,14 @@
 module Enum exposing
     ( Enum
-    , decoder, encoder, find, make, toString
+    , find, make
+    , decoder, encoder, toString
     )
 
 {-| Enum provides support for various different ways of defining an enum in Elm.
 
 @docs Enum
-@docs decoder, encoder, find, make, toString
+@docs find, make
+@docs decoder, encoder, toString
 
 -}
 
