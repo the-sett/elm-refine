@@ -1,7 +1,7 @@
 module Enum exposing
     ( Enum
-    , find, make
-    , decoder, encoder, toString
+    , define, build
+    , decoder, encoder, toString, emptyDict, singletonDict
     )
 
 {-| Enum provides support for various different ways of defining an enum in Elm.
@@ -10,12 +10,12 @@ module Enum exposing
 # Definition of Enums and functions to create them.
 
 @docs Enum
-@docs find, make
+@docs define, build
 
 
 # Helper functions for working with Enums.
 
-@docs decoder, encoder, toString
+@docs decoder, encoder, toString, emptyDict, singletonDict
 
 -}
 
@@ -34,9 +34,18 @@ type Enum a
 {-| Creates an enum definition from a list of possible values and a definition opf
 the `toString` function.
 -}
-make : List a -> (a -> String) -> Enum a
-make vals toStringFn =
+define : List a -> (a -> String) -> Enum a
+define vals toStringFn =
     Enum vals toStringFn
+
+
+{-| Looks up an instance of an enum from its string representation.
+-}
+build : Enum a -> String -> Maybe a
+build (Enum vals toStringFn) val =
+    vals
+        |> List.filter ((==) val << toStringFn)
+        |> List.head
 
 
 {-| Turns an instance of an enum into a string.
@@ -46,15 +55,6 @@ toString (Enum _ toStringFn) val =
     toStringFn val
 
 
-{-| Looks up an instance of an enum from its string representation.
--}
-find : Enum a -> String -> Maybe a
-find (Enum vals toStringFn) val =
-    vals
-        |> List.filter ((==) val << toStringFn)
-        |> List.head
-
-
 {-| JSON Decoder for an enum
 -}
 decoder : Enum a -> Decoder a
@@ -62,7 +62,7 @@ decoder enum =
     Decode.string
         |> Decode.andThen
             (\val ->
-                case find enum val of
+                case build enum val of
                     Just value ->
                         Decode.succeed value
 

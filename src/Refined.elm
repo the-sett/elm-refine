@@ -1,6 +1,6 @@
 module Refined exposing
     ( Refined
-    , make, build
+    , define, build
     , decoder, encoder, emptyDict, singletonDict
     , IntError, intErrorToString, gt, lt
     , StringError, stringErrorToString, minLength, maxLength, regexMatch
@@ -16,7 +16,7 @@ values can ever be created.
 # Definition of Refined types and functions to create them.
 
 @docs Refined
-@docs make, build
+@docs define, build
 
 
 # Helper functions for working with refined types.
@@ -58,8 +58,8 @@ type Refined i a e
 encoder on the underlying basic type, the error to string function, and the unboxing function
 that extracts the underlying basic type.
 -}
-make : (i -> Result e a) -> Decoder i -> (i -> Value) -> (e -> String) -> (a -> i) -> Refined i a e
-make guardFn dec enc errorToStringFn unboxFn =
+define : (i -> Result e a) -> Decoder i -> (i -> Value) -> (e -> String) -> (a -> i) -> Refined i a e
+define guardFn dec enc errorToStringFn unboxFn =
     Refined guardFn dec enc errorToStringFn unboxFn
 
 
