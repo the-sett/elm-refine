@@ -10,6 +10,7 @@ module Enum exposing
 
 -}
 
+import Dict.Enum
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 
@@ -69,12 +70,21 @@ encoder enum val =
         |> Encode.string
 
 
+{-| Creates an empty dict with an `Enum` key.
+-}
+emptyDict : Enum k -> Dict.Enum.Dict k v
+emptyDict (Enum _ toStringFn) =
+    Dict.Enum.empty toStringFn
 
-{- Dicts -}
--- emptyDict : Enum k -> Dict String k v
---
---
--- singletonDict : Enum k -> k -> v -> Dict String k v
+
+{-| Creates a dict with a single entry with an `Enum` key.
+-}
+singletonDict : Enum k -> k -> v -> Dict.Enum.Dict k v
+singletonDict (Enum _ toStringFn) =
+    Dict.Enum.singleton toStringFn
+
+
+
 {- Sets -}
 -- emptySet : Enum k -> Set k
 --

@@ -41,15 +41,15 @@ encoder (Refined _ _ encoderI _ unboxFn) val =
         |> encoderI
 
 
-
-{- Dicts -}
-
-
+{-| Creates an empty dict with a `Refined` key.
+-}
 emptyDict : Refined comparable k e -> Dict.Refined.Dict comparable k v
 emptyDict (Refined _ _ _ _ unboxFn) =
     Dict.Refined.empty unboxFn
 
 
+{-| Creates a dict with a single entry with a `Refined` key.
+-}
 singletonDict : Refined comparable k e -> k -> v -> Dict.Refined.Dict comparable k v
 singletonDict (Refined _ _ _ _ unboxFn) =
     Dict.Refined.singleton unboxFn
