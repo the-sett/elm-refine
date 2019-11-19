@@ -1,5 +1,6 @@
 module Refined exposing (..)
 
+import Dict.Refined
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import Regex
@@ -42,10 +43,19 @@ encoder (Refined _ _ encoderI _ unboxFn) val =
 
 
 {- Dicts -}
--- emptyDict : Refined comparable k e -> Dict comparable k v
---
---
--- singletonDict : Refined comparable k e -> k -> v -> Dict comparable k v
+
+
+emptyDict : Refined comparable k e -> Dict.Refined.Dict comparable k v
+emptyDict (Refined _ _ _ _ unboxFn) =
+    Dict.Refined.empty unboxFn
+
+
+singletonDict : Refined comparable k e -> k -> v -> Dict.Refined.Dict comparable k v
+singletonDict (Refined _ _ _ _ unboxFn) =
+    Dict.Refined.singleton unboxFn
+
+
+
 {- Sets -}
 -- emptySet : Refined comparable k e -> Set comparable k
 --

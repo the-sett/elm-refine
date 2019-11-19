@@ -1,5 +1,6 @@
-module Dict.Impl exposing
-    ( insert, update, remove
+module Dict.Refined exposing
+    ( Dict
+    , empty, singleton, insert, update, remove
     , isEmpty, member, get, size
     , keys, values, toList, fromList
     , map, foldl, foldr, filter, partition
@@ -16,7 +17,7 @@ module Dict.Impl exposing
 
 # Build
 
-@docs insert, update, remove
+@docs empty, singleton, insert, update, remove
 
 
 # Query
@@ -62,9 +63,9 @@ empty toKey =
 
 {-| Create a dictionary with one key-value pair.
 -}
-singleton : k -> v -> (k -> comparable) -> Dict comparable k v
-singleton k v f =
-    empty f
+singleton : (k -> comparable) -> k -> v -> Dict comparable k v
+singleton toKey k v =
+    empty toKey
         |> insert k v
 
 
@@ -152,10 +153,10 @@ toList (Dict { dict }) =
 {-| Convert an association list into a dict.
 -}
 fromList : (k -> comparable) -> List ( k, v ) -> Dict comparable k v
-fromList f xs =
+fromList toKey xs =
     Dict
-        { toKey = f
-        , dict = Dict.fromList <| List.map (\( k, v ) -> ( f k, ( k, v ) )) xs
+        { toKey = toKey
+        , dict = Dict.fromList <| List.map (\( k, v ) -> ( toKey k, ( k, v ) )) xs
         }
 
 
