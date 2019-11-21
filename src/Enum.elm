@@ -1,7 +1,8 @@
 module Enum exposing
     ( Enum
     , define, build
-    , decoder, encoder, toString, emptyDict, singletonDict
+    , decoder, encoder, toString
+    , emptyDict, singletonDict, dictDecoder, dictEncoder
     )
 
 {-| Enum provides support for various different ways of defining an enum in Elm.
@@ -15,7 +16,12 @@ module Enum exposing
 
 # Helper functions for working with Enums.
 
-@docs decoder, encoder, toString, emptyDict, singletonDict
+@docs decoder, encoder, toString
+
+
+# Dicts over enum keys.
+
+@docs emptyDict, singletonDict, dictDecoder, dictEncoder, emptyDict, singletonDict
 
 -}
 
