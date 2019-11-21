@@ -1,7 +1,8 @@
 module Refined exposing
     ( Refined
-    , define, build
-    , decoder, encoder, emptyDict, singletonDict
+    , define, build, errorToString
+    , decoder, encoder
+    , emptyDict, singletonDict, dictDecoder, dictEncoder
     , IntError, intErrorToString, gt, lt
     , StringError, stringErrorToString, minLength, maxLength, regexMatch
     )
@@ -16,12 +17,17 @@ values can ever be created.
 # Definition of Refined types and functions to create them.
 
 @docs Refined
-@docs define, build
+@docs define, build, errorToString
 
 
 # Helper functions for working with refined types.
 
-@docs decoder, encoder, emptyDict, singletonDict
+@docs decoder, encoder
+
+
+# Dicts over refined keys.
+
+@docs emptyDict, singletonDict, dictDecoder, dictEncoder
 
 
 # Functions for building refined integers.
@@ -70,6 +76,11 @@ build (Refined buildFn _ _ _ _) val =
     buildFn val
 
 
+errorToString : Refined i a e -> e -> String
+errorToString (Refined _ _ _ errorToStringFn _) err =
+    errorToStringFn err
+
+
 {-| JSON decoder for a refined type.
 -}
 decoder : Refined i a e -> Decoder a
@@ -87,12 +98,68 @@ decoder (Refined buildFn decoderI _ errorToStringFn _) =
             )
 
 
+{-| Creates a decoder for dictionaries with refined values as keys.
+-}
+dictDecoder : Refined comparable k e -> Decoder v -> Decoder (Dict.Refined.Dict comparable k v)
+dictDecoder refined valDecoder =
+    let
+        toDict : List ( String, v ) -> Result String (Dict.Refined.Dict comparable k v)
+        toDict keyValuePairs =
+            List.foldl
+                (\( fieldName, v ) accum ->
+                    let
+                        fieldNameToRefinedRes =
+                            fromString refined fieldName
+
+                        --|> Result.andThen (build refined)
+                    in
+                    case ( fieldNameToRefinedRes, accum ) of
+                        ( Ok k, Ok dict ) ->
+                            Dict.Refined.insert k v dict |> Ok
+
+                        ( Err err, _ ) ->
+                            "Field name is not a memeber of the refined type. "
+                                ++ Decode.errorToString err
+                                |> Err
+
+                        ( _, Err _ ) ->
+                            accum
+                )
+                (emptyDict refined |> Ok)
+                keyValuePairs
+    in
+    Decode.keyValuePairs valDecoder
+        |> Decode.andThen
+            (\kvps ->
+                case toDict kvps of
+                    Ok dict ->
+                        Decode.succeed dict
+
+                    Err val ->
+                        Decode.fail val
+            )
+
+
 {-| JSON encoder for a refined type.
 -}
 encoder : Refined i a e -> a -> Value
 encoder (Refined _ _ encoderI _ unboxFn) val =
     unboxFn val
         |> encoderI
+
+
+dictEncoder : Refined comparable k e -> (v -> Value) -> Dict.Refined.Dict comparable k v -> Value
+dictEncoder refined valEncoder dict =
+    Dict.Refined.foldl (\k v accum -> ( toString refined k, valEncoder v ) :: accum) [] dict
+        |> Encode.object
+
+
+toString refined val =
+    encoder refined val |> Encode.encode 0
+
+
+fromString refined val =
+    Decode.decodeString (decoder refined) val
 
 
 {-| Creates an empty dict with a `Refined` key.
