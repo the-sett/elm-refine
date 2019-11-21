@@ -71,12 +71,25 @@ decoder enum =
             )
 
 
+{-| Creates a decoder for dictionaries with enum values as keys.
+-}
+dictDecoder : Enum k -> Decoder v -> Decoder (Dict.Enum.Dict k v)
+dictDecoder enum valDecoder =
+    Decode.keyValuePairs valDecoder
+
+
 {-| JSON Encoder for an enum.
 -}
 encoder : Enum a -> a -> Value
 encoder enum val =
     toString enum val
         |> Encode.string
+
+
+dictEncoder : Enum k -> (v -> Value) -> Dict.Enum.Dict k v -> Value
+dictEncoder enum valEncoder dict =
+    Dict.Enum.foldl (\k v accum -> ( toString enum k, valEncoder v ) :: accum) [] dict
+        |> Encode.object
 
 
 {-| Creates an empty dict with an `Enum` key.
