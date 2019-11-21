@@ -75,7 +75,34 @@ decoder enum =
 -}
 dictDecoder : Enum k -> Decoder v -> Decoder (Dict.Enum.Dict k v)
 dictDecoder enum valDecoder =
+    let
+        toDict : List ( String, v ) -> Result String (Dict.Enum.Dict k v)
+        toDict keyValuePairs =
+            List.foldl
+                (\( fieldName, v ) accum ->
+                    case ( build enum fieldName, accum ) of
+                        ( Just k, Ok dict ) ->
+                            Dict.Enum.insert k v dict |> Ok
+
+                        ( Nothing, _ ) ->
+                            Err "fieldName is not a member of the enum."
+
+                        ( _, Err _ ) ->
+                            accum
+                )
+                (emptyDict enum |> Ok)
+                keyValuePairs
+    in
     Decode.keyValuePairs valDecoder
+        |> Decode.andThen
+            (\kvps ->
+                case toDict kvps of
+                    Ok dict ->
+                        Decode.succeed dict
+
+                    Err val ->
+                        Decode.fail val
+            )
 
 
 {-| JSON Encoder for an enum.
