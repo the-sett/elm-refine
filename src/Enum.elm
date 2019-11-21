@@ -85,7 +85,10 @@ dictDecoder enum valDecoder =
                             Dict.Enum.insert k v dict |> Ok
 
                         ( Nothing, _ ) ->
-                            Err "fieldName is not a member of the enum."
+                            "Field with name '"
+                                ++ fieldName
+                                ++ "' is not a member of the enum."
+                                |> Err
 
                         ( _, Err _ ) ->
                             accum
