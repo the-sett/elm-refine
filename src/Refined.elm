@@ -76,6 +76,8 @@ build (Refined buildFn _ _ _ _) val =
     buildFn val
 
 
+{-| Prints the error messages resulting from failing to create an instance of a refined type.
+-}
 errorToString : Refined i a e -> e -> String
 errorToString (Refined _ _ _ errorToStringFn _) err =
     errorToStringFn err
@@ -148,6 +150,8 @@ encoder (Refined _ _ encoderI _ unboxFn) val =
         |> encoderI
 
 
+{-| Creates an encoder for dictionaries with refined values as keys.
+-}
 dictEncoder : Refined comparable k e -> (v -> Value) -> Dict.Refined.Dict comparable k v -> Value
 dictEncoder refined valEncoder dict =
     Dict.Refined.foldl (\k v accum -> ( toString refined k, valEncoder v ) :: accum) [] dict

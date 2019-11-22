@@ -21,7 +21,7 @@ module Enum exposing
 
 # Dicts over enum keys.
 
-@docs emptyDict, singletonDict, dictDecoder, dictEncoder, emptyDict, singletonDict
+@docs emptyDict, singletonDict, dictDecoder, dictEncoder
 
 -}
 
@@ -122,6 +122,8 @@ encoder enum val =
         |> Encode.string
 
 
+{-| Creates an encoder for dictionaries with enum values as keys.
+-}
 dictEncoder : Enum k -> (v -> Value) -> Dict.Enum.Dict k v -> Value
 dictEncoder enum valEncoder dict =
     Dict.Enum.foldl (\k v accum -> ( toString enum k, valEncoder v ) :: accum) [] dict
