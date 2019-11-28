@@ -3,7 +3,7 @@ module Refined exposing
     , define, build, errorToString
     , decoder, encoder
     , emptyDict, singletonDict, dictDecoder, dictEncoder
-    , IntError, intErrorToString, gt, lt
+    , IntError, intErrorToString, gt, gte, lt, lte
     , StringError, stringErrorToString, minLength, maxLength, regexMatch
     )
 
