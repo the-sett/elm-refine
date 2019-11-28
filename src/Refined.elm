@@ -32,7 +32,7 @@ values can ever be created.
 
 # Functions for building refined integers.
 
-@docs IntError, intErrorToString, gt, lt
+@docs IntError, intErrorToString, gt, gte, lt, lte
 
 
 # Functions for building refined strings.
@@ -212,7 +212,19 @@ intErrorToString err =
 -}
 gt : Int -> Int -> Result IntError Int
 gt bound val =
-    if bound <= val then
+    if val <= bound then
+        Err BelowRange
+
+    else
+        Ok val
+
+
+{-| Guard function for creating an integer that must be greater than or equal to
+a given value.
+-}
+gte : Int -> Int -> Result IntError Int
+gte bound val =
+    if val < bound then
         Err BelowRange
 
     else
@@ -223,7 +235,19 @@ gt bound val =
 -}
 lt : Int -> Int -> Result IntError Int
 lt bound val =
-    if bound >= val then
+    if val >= bound then
+        Err AboveRange
+
+    else
+        Ok val
+
+
+{-| Guard function for creating an integer that must be less than or equal to
+a given value.
+-}
+lte : Int -> Int -> Result IntError Int
+lte bound val =
+    if val > bound then
         Err AboveRange
 
     else
