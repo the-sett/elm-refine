@@ -1,7 +1,7 @@
 module Refined exposing
     ( Refined
     , define, build, errorToString
-    , decoder, encoder
+    , decoder, encoder, unbox
     , emptyDict, singletonDict, dictDecoder, dictEncoder
     , IntError, intErrorToString, gt, gte, lt, lte
     , StringError, stringErrorToString, minLength, maxLength, regexMatch
@@ -22,7 +22,7 @@ values can ever be created.
 
 # Helper functions for working with refined types.
 
-@docs decoder, encoder
+@docs decoder, encoder, unbox
 
 
 # Dicts over refined keys.
@@ -74,6 +74,13 @@ define guardFn dec enc errorToStringFn unboxFn =
 build : Refined i a e -> i -> Result e a
 build (Refined buildFn _ _ _ _) val =
     buildFn val
+
+
+{-| Unboxes an instance of a refined type.
+-}
+unbox : Refined i a e -> a -> i
+unbox (Refined _ _ _ _ unboxFn) val =
+    unboxFn val
 
 
 {-| Prints the error messages resulting from failing to create an instance of a refined type.
