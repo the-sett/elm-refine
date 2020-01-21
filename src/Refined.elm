@@ -166,7 +166,17 @@ dictEncoder refined valEncoder dict =
 
 
 toString refined val =
-    encoder refined val |> Encode.encode 0
+    let
+        jsonAsString =
+            encoder refined val |> Encode.encode 0
+    in
+    if String.startsWith "\"" jsonAsString then
+        jsonAsString
+            |> String.dropLeft 1
+            |> String.dropRight 1
+
+    else
+        jsonAsString
 
 
 fromString refined val =
