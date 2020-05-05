@@ -2,7 +2,7 @@ module Enum exposing
     ( Enum
     , define, build
     , decoder, encoder, toString
-    , emptyDict, singletonDict, dictDecoder, dictEncoder
+    , emptyDict, singletonDict, dictDecoder, dictEncoder, stringDict
     )
 
 {-| Enum provides support for various different ways of defining an enum in Elm.
@@ -21,10 +21,11 @@ module Enum exposing
 
 # Dicts over enum keys.
 
-@docs emptyDict, singletonDict, dictDecoder, dictEncoder
+@docs emptyDict, singletonDict, dictDecoder, dictEncoder, stringDict
 
 -}
 
+import Dict
 import Dict.Enum
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -128,6 +129,13 @@ dictEncoder : Enum k -> (v -> Value) -> Dict.Enum.Dict k v -> Value
 dictEncoder enum valEncoder dict =
     Dict.Enum.foldl (\k v accum -> ( toString enum k, valEncoder v ) :: accum) [] dict
         |> Encode.object
+
+
+{-| Turns a Dict with enum keys, into a normal Dict with the enum keys as strings.
+-}
+stringDict : Enum k -> (v -> a) -> Dict.Enum.Dict k v -> Dict.Dict String a
+stringDict (Enum _ toStringFn) valEncoder dict =
+    Dict.Enum.foldl (\k v accum -> Dict.insert (toStringFn k) (valEncoder v) accum) Dict.empty dict
 
 
 {-| Creates an empty dict with an `Enum` key.

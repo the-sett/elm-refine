@@ -2,7 +2,7 @@ module Refined exposing
     ( Refined
     , define, build, errorToString
     , decoder, encoder
-    , emptyDict, singletonDict, dictDecoder, dictEncoder
+    , emptyDict, singletonDict, dictDecoder, dictEncoder, unboxedDict
     , IntError, intErrorToString, gt, lt
     , StringError, stringErrorToString, minLength, maxLength, regexMatch
     )
@@ -27,7 +27,7 @@ values can ever be created.
 
 # Dicts over refined keys.
 
-@docs emptyDict, singletonDict, dictDecoder, dictEncoder
+@docs emptyDict, singletonDict, dictDecoder, dictEncoder, unboxedDict
 
 
 # Functions for building refined integers.
@@ -41,6 +41,7 @@ values can ever be created.
 
 -}
 
+import Dict
 import Dict.Refined
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -156,6 +157,13 @@ dictEncoder : Refined comparable k e -> (v -> Value) -> Dict.Refined.Dict compar
 dictEncoder refined valEncoder dict =
     Dict.Refined.foldl (\k v accum -> ( toString refined k, valEncoder v ) :: accum) [] dict
         |> Encode.object
+
+
+{-| Turns a Dict with refined keys, into a normal Dict with the refined keys unboxed to their underlying type.
+-}
+unboxedDict : Refined comparable k e -> (v -> a) -> Dict.Refined.Dict comparable k v -> Dict.Dict comparable a
+unboxedDict (Refined _ _ _ _ unboxFn) valEncoder dict =
+    Dict.Refined.foldl (\k v accum -> Dict.insert (unboxFn k) (valEncoder v) accum) Dict.empty dict
 
 
 toString refined val =
