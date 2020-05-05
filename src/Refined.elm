@@ -1,9 +1,9 @@
 module Refined exposing
     ( Refined
     , define, build, errorToString
-    , decoder, encoder
+    , decoder, encoder, unbox
     , emptyDict, singletonDict, dictDecoder, dictEncoder, unboxedDict
-    , IntError, intErrorToString, gt, lt
+    , IntError, intErrorToString, gt, gte, lt, lte
     , StringError, stringErrorToString, minLength, maxLength, regexMatch
     )
 
@@ -22,7 +22,7 @@ values can ever be created.
 
 # Helper functions for working with refined types.
 
-@docs decoder, encoder
+@docs decoder, encoder, unbox
 
 
 # Dicts over refined keys.
@@ -32,7 +32,7 @@ values can ever be created.
 
 # Functions for building refined integers.
 
-@docs IntError, intErrorToString, gt, lt
+@docs IntError, intErrorToString, gt, gte, lt, lte
 
 
 # Functions for building refined strings.
@@ -75,6 +75,13 @@ define guardFn dec enc errorToStringFn unboxFn =
 build : Refined i a e -> i -> Result e a
 build (Refined buildFn _ _ _ _) val =
     buildFn val
+
+
+{-| Unboxes an instance of a refined type.
+-}
+unbox : Refined i a e -> a -> i
+unbox (Refined _ _ _ _ unboxFn) val =
+    unboxFn val
 
 
 {-| Prints the error messages resulting from failing to create an instance of a refined type.
@@ -167,7 +174,17 @@ unboxedDict (Refined _ _ _ _ unboxFn) valEncoder dict =
 
 
 toString refined val =
-    encoder refined val |> Encode.encode 0
+    let
+        jsonAsString =
+            encoder refined val |> Encode.encode 0
+    in
+    if String.startsWith "\"" jsonAsString then
+        jsonAsString
+            |> String.dropLeft 1
+            |> String.dropRight 1
+
+    else
+        jsonAsString
 
 
 fromString refined val =
@@ -220,7 +237,19 @@ intErrorToString err =
 -}
 gt : Int -> Int -> Result IntError Int
 gt bound val =
-    if bound <= val then
+    if val <= bound then
+        Err BelowRange
+
+    else
+        Ok val
+
+
+{-| Guard function for creating an integer that must be greater than or equal to
+a given value.
+-}
+gte : Int -> Int -> Result IntError Int
+gte bound val =
+    if val < bound then
         Err BelowRange
 
     else
@@ -231,7 +260,19 @@ gt bound val =
 -}
 lt : Int -> Int -> Result IntError Int
 lt bound val =
-    if bound >= val then
+    if val >= bound then
+        Err AboveRange
+
+    else
+        Ok val
+
+
+{-| Guard function for creating an integer that must be less than or equal to
+a given value.
+-}
+lte : Int -> Int -> Result IntError Int
+lte bound val =
+    if val > bound then
         Err AboveRange
 
     else
